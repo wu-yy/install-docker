@@ -14,25 +14,26 @@ function download_docker() {
     DOCKER_URL="https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VER}.tgz"
   fi
 
+  mkdir -p "$BASE/down"
+
   if [[ -f "$BASE/down/docker-${DOCKER_VER}.tgz" ]];then
-    logger warn "docker binaries already existed"
+    echo "docker binaries already existed"
   else
-    logger info "downloading docker binaries, version $DOCKER_VER"
+    echo "downloading docker binaries, version $DOCKER_VER"
     if [[ -e /usr/bin/curl ]];then
-      curl -C- -O --retry 3 "$DOCKER_URL" || { logger error "downloading docker failed"; exit 1; }
+      curl -C- -O --retry 3 "$DOCKER_URL" || { echo "downloading docker failed"; exit 1; }
     else
-      wget -c "$DOCKER_URL" || { logger error "downloading docker failed"; exit 1; }
+      wget -c "$DOCKER_URL" || { echo "downloading docker failed"; exit 1; }
     fi
     /bin/mv -f "./docker-$DOCKER_VER.tgz" "$BASE/down"
   fi
-
   tar zxf "$BASE/down/docker-$DOCKER_VER.tgz" -C "$BASE/down" && \
-  /bin/mv -f "$BASE"/down/docker/* /user/bin && \
+  /bin/mv -f "$BASE"/down/docker/* /usr/bin
 }
 
 function install_docker() {
   # check if a container runtime is already installed
-  systemctl status docker|grep Active|grep -q running && { logger warn "docker is already running."; return 0; }
+  systemctl status docker|grep Active|grep -q running && { echo "docker is already running."; return 0; }
  
   logger debug "generate docker service file"
   cat > /etc/systemd/system/docker.service << EOF
@@ -76,7 +77,7 @@ EOF
     "max-size": "10m",
     "max-file": "3"
     },
-  "data-root": "/data2/docker",
+  "data-root": "/data/docker",
   "runtimes": {
         "nvidia": {
             "path": "/usr/bin/nvidia-container-runtime",
