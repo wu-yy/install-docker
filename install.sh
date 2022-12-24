@@ -4,7 +4,7 @@ set -o errexit
 
 # default settings, can be overridden by cmd line options, see usage
 DOCKER_VER=19.03.14
-BASE=/home/wuyongyu
+BASE=./tmp
 REGISTRY_MIRROR=CN
 
 function download_docker() {
@@ -36,7 +36,22 @@ function install_docker() {
   systemctl status docker|grep Active|grep -q running && { echo "docker is already running."; return 0; }
  
   logger debug "generate docker service file"
-  cat > /etc/systemd/system/docker.service << EOF
+  
+cat > /usr/lib/systemd/system/docker.socket << EOF 
+[Unit]
+Description=Docker Socket for the API
+
+[Socket]
+ListenStream=/var/run/docker.sock
+SocketMode=0660
+SocketUser=root
+SocketGroup=docker
+
+[Install]
+WantedBy=sockets.target
+EOF
+  
+  cat > /usr/lib/systemd/system/docker.service << EOF
 [Unit]
 Description=Docker Application Container Engine
 Documentation=http://docs.docker.io
