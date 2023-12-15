@@ -62,7 +62,7 @@ Wants=containerd.service
 
 [Service]
 Environment="PATH=/bin:/sbin:/usr/bin:/usr/sbin"
-ExecStart=/usr/bin/dockerd
+ExecStart=/usr/bin/dockerd -H unix:///var/run/docker.sock
 ExecStartPost=/sbin/iptables -I FORWARD -s 0.0.0.0/0 -j ACCEPT
 ExecReload=/bin/kill -s HUP \$MAINPID
 Restart=on-failure
