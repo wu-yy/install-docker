@@ -134,6 +134,7 @@ EOF
 
   logger debug "enable and start docker"
   systemctl enable docker
+  sudo groupadd docker
   systemctl daemon-reload && systemctl restart docker && sleep 4
   sudo chmod 666 /var/run/docker.sock
 }
